@@ -109,3 +109,29 @@ router.post('/getBookingInfo', async function (req, res) {
     return RES.error(res, err, `Failed`);
   }
 });
+
+router.post('/getVirtualRoom', async function (req, res) {
+  try {
+    console.log('/getVirtualRoom');
+    var data = req.body.data;
+    data = encdec.decryptObject('client', data);
+    data = await fc.getVirtualRoom(data);
+    return RES.solved(res, data, 'client');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
+
+router.post('/updateVirtualRoom', async function (req, res) {
+  try {
+    console.log('/updateVirtualRoom');
+    var data = req.body.data;
+    data = encdec.decryptObject('client', data);
+    data = await fc.updateVirtualRoom(data);
+    return RES.solved(res, data, 'client');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});

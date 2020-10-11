@@ -72,6 +72,20 @@ module.exports.updateStudentInfo = function updateStudentInfo(data) {
             studentAddress = "${data.studentAddress}"
         WHERE studentID = "${data.studentID}"
         `;
+    } else if (data.type == "bookingStatus") {
+      var query = `
+        UPDATE studentInfo
+        SET 
+        bookingStatus = "${data.bookingStatus}"
+        WHERE studentID = "${data.studentID}"
+        `;
+    } else if (data.type == "vrCode") {
+      var query = `
+        UPDATE studentInfo
+        SET 
+        vrCode = "${data.vrCode}"
+        WHERE studentID = "${data.studentID}"
+        `;
     }
     //console.log(query);
     dbFYP.query(query, function (err, snapshot) {
@@ -106,6 +120,81 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       WHERE 
       studentID = '${data.studentID}'
       ORDER BY UNIX_TIMESTAMP(checkInDate) DESC
+      `;
+    } else if (data.type == "currentRoommates") {
+      var query = `
+      SELECT A.studentName, A.studentContact, A.studentEmail, B.bed
+      FROM studentInfo A
+      INNER JOIN bookingHistory B
+      ON A.studentID = B.studentID
+      WHERE 
+      A.roomNumber = '${data.roomNumber}' AND B.status = 'Checked-in'
+      ORDER BY B.bed
+      `;
+    } else if (data.type == "count") {
+      var query = `
+      SELECT COUNT(studentID) AS bookingHistoryCount
+      FROM bookingHistory
+      WHERE studentID = '${data.studentID}'
+      `;
+    }
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.getVirtualRoom = function getVirtualRoom(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "roomAvailablityCheck") {
+      var query = `
+      SELECT COUNT(${data.vrCode}) AS count
+      FROM virtualRoom
+      WHERE vrCode = '${data.vrCode}' AND vrStatus = '0'
+      `;
+    } else if (data.type == "capacityCheck") {
+      var query = `
+      SELECT vrCapacity, currentCapacity, vrRoommates, vrPassword
+      FROM virtualRoom
+      WHERE vrCode = '${data.vrCode}' AND vrStatus = '0'
+      `;
+    } else if (data.type == "vrInfo") {
+      var query = `
+      SELECT *
+      FROM virtualRoom
+      WHERE vrCode = '${data.vrCode}' AND vrStatus = '0'
+      `;
+    } else if (data.type == "getVRCode") {
+      var query = `
+      SELECT vrCode
+      FROM virtualRoom
+      WHERE vrHost = '${data.vrHost}' AND vrStatus = '0'
+      `;
+    } 
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.updateVirtualRoom = function updateVirtualRoom(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "createVR") {
+      var query = `
+      INSERT INTO virtualRoom (vrPassword, vrCapacity, vrHost)
+      VALUES ('${data.vrPassword}', '${data.vrCapacity}', '${data.vrHost}')
+      `;
+    } else if (data.type == "joinVR") {
+      var query = `
+      UPDATE virtualRoom
+      SET 
+      vrRoommates = "${data.vrRoommates}",
+      currentCapacity = currentCapacity + 1
+      WHERE vrCode = "${data.vrCode}"
       `;
     }
     console.log(query);
