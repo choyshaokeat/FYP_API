@@ -86,6 +86,23 @@ module.exports.updateStudentInfo = function updateStudentInfo(data) {
         vrCode = "${data.vrCode}"
         WHERE studentID = "${data.studentID}"
         `;
+    } else if (data.type == "deleteVR") {
+      var query = `
+        UPDATE studentInfo
+        SET 
+        bookingStatus = "0",
+        vrCode = NULL
+        WHERE vrCode = "${data.vrCode}"
+        `;
+    } else if (data.type == "updateRoomInfo") {
+      var query = `
+        UPDATE studentInfo
+        SET 
+        bookingStatus = "2",
+        roomNumber = "${data.roomNumber}",
+        bed = "${data.bed}",
+        WHERE studentID = "${data.studentID}"
+        `;
     }
     //console.log(query);
     dbFYP.query(query, function (err, snapshot) {
@@ -97,13 +114,22 @@ module.exports.updateStudentInfo = function updateStudentInfo(data) {
 
 module.exports.getStudentInfo = function getStudentInfo(data) {
   return new Promise((resolve, reject) => {
-    var query = `
+    if (data.type == "getVRRoommates") {
+      var query = `
+      SELECT *
+      FROM studentInfo
+      WHERE 
+        vrCode = '${data.vrCode}' AND studentID != '${data.vrHost}'
+      `;
+    } else {
+      var query = `
       SELECT *
       FROM studentInfo
       WHERE 
         studentID = '${data.studentID}'
       `;
-    //console.log(query);
+    }
+    console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
       resolve(snapshot);
@@ -138,7 +164,26 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       WHERE studentID = '${data.studentID}'
       `;
     }
-    console.log(query);
+    //console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.updateBookingInfo = function updateBookingInfo(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "createBookingHistory") {
+      var query = `
+      INSERT INTO bookingHistory
+      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, checkInDate, checkOutDate, numberOfSemester)
+      VALUES
+      ("${data.studentID}","${data.roomNumber}","${data.village}", "${data.block}", "${data.level}", "${data.bed}",
+      "${data.aircond}","${data.fees}","${data.status}", "${data.checkInDate}", "${data.checkOutDate}", "${data.numberOfSemester}")
+      `;
+    }
+    //console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
       resolve(snapshot);
@@ -172,8 +217,8 @@ module.exports.getVirtualRoom = function getVirtualRoom(data) {
       FROM virtualRoom
       WHERE vrHost = '${data.vrHost}' AND vrStatus = '0'
       `;
-    } 
-    console.log(query);
+    }
+    //console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
       resolve(snapshot);
@@ -196,7 +241,92 @@ module.exports.updateVirtualRoom = function updateVirtualRoom(data) {
       currentCapacity = currentCapacity + 1
       WHERE vrCode = "${data.vrCode}"
       `;
+    } else if (data.type == "deleteVR") {
+      var query = `
+      UPDATE virtualRoom
+      SET 
+      vrStatus = "2"
+      WHERE vrCode = "${data.vrCode}"
+      `;
     }
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.getRoomInfo = function getRoomInfo(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "getVillage") {
+      var query = `
+      SELECT distinct village
+      FROM roomInfo
+      ORDER BY village ASC
+      `;
+    } else if (data.type == "getBuilding") {
+      var query = `
+      SELECT distinct block
+      FROM roomInfo
+      WHERE village = "${data.village}"
+      ORDER BY block ASC
+      `;
+    } else if (data.type == "getRoom") {
+      var query = `
+      SELECT *
+      FROM roomInfo
+      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}"
+      ORDER BY roomNumber, bed ASC
+      `;
+    } else if (data.type == "filterRoom") {
+      var query = `
+      SELECT *
+      FROM roomInfo
+      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND capacity = "${data.capacity}"
+      ORDER BY roomNumber, bed ASC
+      `;
+    } else if (data.type == "getRoomCapacity") {
+      var query = `
+      SELECT distinct capacity
+      FROM roomInfo
+      WHERE village = "${data.village}" AND block = "${data.block}"
+      ORDER BY capacity ASC
+      `;
+    } else if (data.type == "getMinRoomCapacity") {
+      var query = `
+      SELECT distinct MIN(capacity) AS capacity
+      FROM roomInfo
+      `;
+    } else if (data.type == "getMaxRoomCapacity") {
+      var query = `
+      SELECT distinct MAX(capacity) AS capacity
+      FROM roomInfo
+      `;
+    } else if (data.type == "checkRoomAvailability") {
+      var query = `
+      SELECT status
+      FROM roomInfo
+      WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
+      `;
+    }
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.updateRoomInfo = function updateRoomInfo(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "updateRoomInfo") {
+      var query = `
+      UPDATE roomInfo
+      SET status = "1",
+      WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
+      `;
+    } 
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);

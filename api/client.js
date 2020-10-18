@@ -110,6 +110,19 @@ router.post('/getBookingInfo', async function (req, res) {
   }
 });
 
+router.post('/updateBookingInfo', async function (req, res) {
+  try {
+    console.log('/updateBookingInfo');
+    var data = req.body.data;
+    data = encdec.decryptObject('client', data);
+    data = await fc.updateBookingInfo(data);
+    return RES.solved(res, data, 'client');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
+
 router.post('/getVirtualRoom', async function (req, res) {
   try {
     console.log('/getVirtualRoom');
@@ -129,6 +142,32 @@ router.post('/updateVirtualRoom', async function (req, res) {
     var data = req.body.data;
     data = encdec.decryptObject('client', data);
     data = await fc.updateVirtualRoom(data);
+    return RES.solved(res, data, 'client');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
+
+router.post('/getRoomInfo', async function (req, res) {
+  try {
+    console.log('/getRoomInfo');
+    var data = req.body.data;
+    data = encdec.decryptObject('client', data);
+    data = await fc.getRoomInfo(data);
+    return RES.solved(res, data, 'client');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
+
+router.post('/updateRoomInfo', async function (req, res) {
+  try {
+    console.log('/updateRoomInfo');
+    var data = req.body.data;
+    data = encdec.decryptObject('client', data);
+    data = await fc.updateRoomInfo(data);
     return RES.solved(res, data, 'client');
   } catch (err) {
     console.log('err', err);
