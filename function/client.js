@@ -100,7 +100,7 @@ module.exports.updateStudentInfo = function updateStudentInfo(data) {
         SET 
         bookingStatus = "2",
         roomNumber = "${data.roomNumber}",
-        bed = "${data.bed}",
+        bed = "${data.bed}"
         WHERE studentID = "${data.studentID}"
         `;
     }
@@ -154,7 +154,7 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       INNER JOIN bookingHistory B
       ON A.studentID = B.studentID
       WHERE 
-      A.roomNumber = '${data.roomNumber}' AND B.status = 'Checked-in'
+      A.roomNumber = '${data.roomNumber}' AND (B.status = 'Checked-in' OR B.status = 'Booked')
       ORDER BY B.bed
       `;
     } else if (data.type == "count") {
@@ -323,7 +323,7 @@ module.exports.updateRoomInfo = function updateRoomInfo(data) {
     if (data.type == "updateRoomInfo") {
       var query = `
       UPDATE roomInfo
-      SET status = "1",
+      SET status = "1"
       WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
       `;
     } 
