@@ -154,7 +154,7 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       INNER JOIN bookingHistory B
       ON A.studentID = B.studentID
       WHERE 
-      A.roomNumber = '${data.roomNumber}' AND (B.status = 'Checked-in' OR B.status = 'Booked')
+      B.roomNumber = '${data.roomNumber}' AND (B.status = 'Checked-in' OR B.status = 'Booked')
       ORDER BY B.bed
       `;
     } else if (data.type == "count") {
@@ -315,6 +315,12 @@ module.exports.getRoomInfo = function getRoomInfo(data) {
       SELECT *, SUM(price) AS unitPrice FROM roomInfo
       WHERE capacity = "${data.capacity}" AND currentCapacity = "${data.capacity}" AND village = "${data.village}" AND block = "${data.block}"
       GROUP BY roomNumber
+      `;
+    } else if (data.type == "checkBulkRoomAvailability") {
+      var query = `
+      SELECT *
+      FROM roomInfo
+      WHERE roomNumber = "${data.roomNumber}"
       `;
     }
     console.log(query);
