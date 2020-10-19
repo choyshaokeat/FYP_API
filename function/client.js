@@ -309,6 +309,13 @@ module.exports.getRoomInfo = function getRoomInfo(data) {
       FROM roomInfo
       WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
       `;
+    } else if (data.type == "getBulkRoom") {
+      //bulk booking
+      var query = `
+      SELECT *, SUM(price) AS unitPrice FROM roomInfo
+      WHERE capacity = "${data.capacity}" AND currentCapacity = "${data.capacity}" AND village = "${data.village}" AND block = "${data.block}"
+      GROUP BY roomNumber
+      `;
     }
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {
@@ -326,7 +333,13 @@ module.exports.updateRoomInfo = function updateRoomInfo(data) {
       SET status = "1"
       WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
       `;
-    } 
+    } else if (data.type == "updateCurrentCapacity") {
+      var query = `
+      UPDATE roomInfo
+      SET currentCapacity = currentCapacity - 1
+      WHERE roomNumber = "${data.roomNumber}"
+      `;
+    }
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
