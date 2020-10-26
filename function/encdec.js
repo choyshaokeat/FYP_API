@@ -3,16 +3,7 @@ var CryptoJS = require("crypto-js");
 var p_key = {
   login: 'key_login.bbb',
   client: 'key_client.bbb',
-  merchant: 'key_merchant.bbb',
-  cart: 'key_cart.bbb',
-  order: 'key_order.bbb',
-  reservation: 'key_reservation.bbb',
-  payment: 'key_payment.bbb',
-  search: 'key_search.bbb',
-  public_key: 'key_public_key.bbb',
-  kitchen: 'key_kitchen.bbb',
-  image: 'key_image.bbb',
-  qrcode: 'key_qrcode.bbb',
+  admin: 'key_admin.bbb',
   mail: 'key_mail.bbb'
 }
 
@@ -21,16 +12,7 @@ function encryptObject(type, value) {
     var key = '';
     if (type == 'login') key = p_key.login;
     else if (type == 'client') key = p_key.client;
-    else if (type == 'merchant') key = p_key.merchant;
-    else if (type == 'cart') key = p_key.cart;
-    else if (type == 'order') key = p_key.order;
-    else if (type == 'reservation') key = p_key.reservation;
-    else if (type == 'payment') key = p_key.payment;
-    else if (type == 'search') key = p_key.search;
-    else if (type == 'public_key') key = p_key.public_key;
-    else if (type == 'kitchen') key = p_key.kitchen;
-    else if (type == 'image') key = p_key.image;
-    else if (type == 'qrcode') key = p_key.qrcode;
+    else if (type == 'admin') key = p_key.admin;
     else if (type == 'mail') key = p_key.mail;
 
     var b64 = CryptoJS.AES.encrypt(JSON.stringify(value), key).toString();
@@ -48,16 +30,7 @@ function decryptObject(type, value) {
     var key = '';
     if (type == 'login') key = p_key.login;
     else if (type == 'client') key = p_key.client;
-    else if (type == 'merchant') key = p_key.merchant;
-    else if (type == 'cart') key = p_key.cart;
-    else if (type == 'order') key = p_key.order;
-    else if (type == 'reservation') key = p_key.reservation;
-    else if (type == 'payment') key = p_key.payment;
-    else if (type == 'search') key = p_key.search;
-    else if (type == 'public_key') key = p_key.public_key;
-    else if (type == 'kitchen') key = p_key.kitchen;
-    else if (type == 'image') key = p_key.image;
-    else if (type == 'qrcode') key = p_key.qrcode;
+    else if (type == 'admin') key = p_key.admin;
     else if (type == 'mail') key = p_key.mail;
 
     var reb64 = CryptoJS.enc.Hex.parse(value);

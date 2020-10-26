@@ -5,6 +5,7 @@ const cors = require('cors');
 var db = require('./api/db.js');
 var agent = require('./api/agent.js');
 var client = require('./api/client.js');
+var admin = require('./api/admin.js');
 
 const app = express();
 const server = require('http').Server(app);
@@ -21,6 +22,7 @@ app.use(cors());
 app.use('/db', db);
 app.use('/agent', agent);
 app.use('/client', client);
+app.use('/admin', admin);
 app.get(function(req,res,next){
 	req.io = io;
 	next();
