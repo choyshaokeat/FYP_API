@@ -26,44 +26,12 @@ module.exports.login = function login(data) {
 module.exports.updateStudentInfo = function updateStudentInfo(data) {
   return new Promise((resolve, reject) => {
     console.log(data);
-    if (data.type == "password") {
-      var query = `
-        UPDATE studentInfo
-        SET
-            studentPW = "${data.studentPW}"
-        WHERE studentID = "${data.studentID}" AND studentEmail = "${data.studentEmail}"
-        `;
-    } else if (data.type == "info") {
-      var query = `
-        UPDATE studentInfo
-        SET 
-            studentName = "${data.studentName}",
-            studentEmail = "${data.studentEmail}",
-            studentContact = "${data.studentContact}",
-            studentAddress = "${data.studentAddress}"
-        WHERE studentID = "${data.studentID}"
-        `;
-    } else if (data.type == "bookingStatus") {
+    if (data.type == "bookingStatus") {
       var query = `
         UPDATE studentInfo
         SET 
         bookingStatus = "${data.bookingStatus}"
         WHERE studentID = "${data.studentID}"
-        `;
-    } else if (data.type == "vrCode") {
-      var query = `
-        UPDATE studentInfo
-        SET 
-        vrCode = "${data.vrCode}"
-        WHERE studentID = "${data.studentID}"
-        `;
-    } else if (data.type == "deleteVR") {
-      var query = `
-        UPDATE studentInfo
-        SET 
-        bookingStatus = "0",
-        vrCode = NULL
-        WHERE vrCode = "${data.vrCode}"
         `;
     } else if (data.type == "updateRoomInfo") {
       var query = `
@@ -76,6 +44,22 @@ module.exports.updateStudentInfo = function updateStudentInfo(data) {
         `;
     }
     //console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.getStudentInfo = function getStudentInfo(data) {
+  return new Promise((resolve, reject) => {
+    var query = `
+    SELECT *
+    FROM studentInfo
+    WHERE 
+    studentID = '${data.studentID}' AND bookingStatus = 0
+    `;
+    console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
       resolve(snapshot);

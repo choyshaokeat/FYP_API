@@ -55,6 +55,19 @@ router.post('/getAdminInfo', async function (req, res) {
   }
 });
 
+router.post('/getStudentInfo', async function (req, res) {
+  try {
+    console.log('/getStudentInfo');
+    var data = req.body.data;
+    data = encdec.decryptObject('admin', data);
+    data = await fc.getStudentInfo(data);
+    return RES.solved(res, data, 'admin');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
+
 router.post('/getBookingInfo', async function (req, res) {
   try {
     console.log('/getBookingInfo');
