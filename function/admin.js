@@ -111,6 +111,13 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       studentID = "${data.studentID}" AND (status = "Booked" OR status = "Checked-in")
       ORDER BY UNIX_TIMESTAMP(bookingDate) DESC
       `;
+    } else if (data.type == "all") {
+      var query = `
+      SELECT *
+      FROM bookingHistory
+      ORDER BY UNIX_TIMESTAMP(bookingDate) DESC
+      LIMIT 200
+      `;
     } 
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {
@@ -134,13 +141,13 @@ module.exports.updateBookingInfo = function updateBookingInfo(data) {
       var query = `
       UPDATE bookingHistory
       SET status = 'Checked-in', checkInDate = '${data.checkInDate}'
-      WHERE studentID = '${data.studentID}' AND roomNumber = '${data.roomNumber}'
+      WHERE studentID = '${data.studentID}' AND roomNumber = '${data.roomNumber}' AND bed = '${data.bed}'
       `;
     } else if (data.type == "checkOut") {
       var query = `
       UPDATE bookingHistory
       SET status = 'Checked-out', checkOutDate = '${data.checkOutDate}'
-      WHERE studentID = '${data.studentID}' AND roomNumber = '${data.roomNumber}'
+      WHERE studentID = '${data.studentID}' AND roomNumber = '${data.roomNumber}' AND bed = '${data.bed}'
       `;
     }
     console.log(query);
@@ -287,6 +294,36 @@ module.exports.updateRoomInfo = function updateRoomInfo(data) {
       SET
       status = "${data.status}"
       WHERE roomNumber = "${data.roomNumber}"
+      `;
+    }
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.getBookingDocument = function getBookingDocument(data) {
+  return new Promise((resolve, reject) => {
+    var query = `
+    SELECT *
+    FROM bookingDocument
+    `;
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.updateBookingDocument = function updateBookingDocument(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "bookingPeriod") {
+      var query = `
+      SELECT *
+      FROM bookingDocument
       `;
     }
     console.log(query);

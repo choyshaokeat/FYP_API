@@ -119,3 +119,29 @@ router.post('/updateRoomInfo', async function (req, res) {
     return RES.error(res, err, `Failed`);
   }
 });
+
+router.post('/getBookingDocument', async function (req, res) {
+  try {
+    console.log('/getBookingDocument');
+    var data = req.body.data;
+    data = encdec.decryptObject('admin', data);
+    data = await fc.getBookingDocument(data);
+    return RES.solved(res, data, 'admin');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
+
+router.post('/updateBookingDocument', async function (req, res) {
+  try {
+    console.log('/updateBookingDocument');
+    var data = req.body.data;
+    data = encdec.decryptObject('admin', data);
+    data = await fc.updateBookingDocument(data);
+    return RES.solved(res, data, 'admin');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});
