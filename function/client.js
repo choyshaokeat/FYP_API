@@ -145,7 +145,7 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       FROM bookingHistory
       WHERE 
       studentID = '${data.studentID}'
-      ORDER BY UNIX_TIMESTAMP(checkInDate) DESC
+      ORDER BY UNIX_TIMESTAMP(bookingDate) DESC
       `;
     } else if (data.type == "currentRoommates") {
       var query = `
@@ -177,10 +177,10 @@ module.exports.updateBookingInfo = function updateBookingInfo(data) {
     if (data.type == "createBookingHistory") {
       var query = `
       INSERT INTO bookingHistory
-      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, checkInDate, checkOutDate, numberOfSemester)
+      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, bookingDate, numberOfSemester)
       VALUES
       ("${data.studentID}","${data.roomNumber}","${data.village}", "${data.block}", "${data.level}", "${data.bed}",
-      "${data.aircond}","${data.fees}","${data.status}", "${data.checkInDate}", "${data.checkOutDate}", "${data.numberOfSemester}")
+      "${data.aircond}","${data.fees}","${data.status}", "${data.bookingDate}", "${data.numberOfSemester}")
       `;
     }
     //console.log(query);

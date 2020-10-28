@@ -37,9 +37,19 @@ module.exports.updateStudentInfo = function updateStudentInfo(data) {
       var query = `
         UPDATE studentInfo
         SET 
-        bookingStatus = "2",
+        bookingStatus = "${data.bookingStatus}",
         roomNumber = "${data.roomNumber}",
         bed = "${data.bed}"
+        WHERE studentID = "${data.studentID}"
+        `;
+    } else if (data.type == "deleteRoomInfo") {
+      var query = `
+        UPDATE studentInfo
+        SET 
+        bookingStatus = "${data.bookingStatus}",
+        roomNumber = NULL,
+        bed = NULL,
+        vrCode = NULL
         WHERE studentID = "${data.studentID}"
         `;
     }
@@ -85,32 +95,24 @@ module.exports.getAdminInfo = function getAdminInfo(data) {
 
 module.exports.getBookingInfo = function getBookingInfo(data) {
   return new Promise((resolve, reject) => {
-    if (data.type == "bookingHistory") {
+    if (data.type == "activeBookingHistory") {
       var query = `
       SELECT *
       FROM bookingHistory
       WHERE 
-      studentID = '${data.studentID}'
-      ORDER BY UNIX_TIMESTAMP(checkInDate) DESC
+      status = "Booked" OR status = "Checked-in"
+      ORDER BY UNIX_TIMESTAMP(bookingDate) DESC
       `;
-    } else if (data.type == "currentRoommates") {
+    } else if (data.type == "filterActiveBookingHistory") {
       var query = `
-      SELECT A.studentName, A.studentContact, A.studentEmail, B.bed
-      FROM studentInfo A
-      INNER JOIN bookingHistory B
-      ON A.studentID = B.studentID
-      WHERE 
-      B.roomNumber = '${data.roomNumber}' AND (B.status = 'Checked-in' OR B.status = 'Booked')
-      ORDER BY B.bed
-      `;
-    } else if (data.type == "count") {
-      var query = `
-      SELECT COUNT(studentID) AS bookingHistoryCount
+      SELECT *
       FROM bookingHistory
-      WHERE studentID = '${data.studentID}'
+      WHERE 
+      studentID = "${data.studentID}" AND (status = "Booked" OR status = "Checked-in")
+      ORDER BY UNIX_TIMESTAMP(bookingDate) DESC
       `;
-    }
-    //console.log(query);
+    } 
+    console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
       resolve(snapshot);
@@ -123,13 +125,25 @@ module.exports.updateBookingInfo = function updateBookingInfo(data) {
     if (data.type == "createBookingHistory") {
       var query = `
       INSERT INTO bookingHistory
-      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, checkInDate, checkOutDate, numberOfSemester)
+      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, bookingDate, expectedCheckInDate, expectedCheckOutDate, numberOfSemester)
       VALUES
-      ("${data.studentID}","${data.roomNumber}","${data.village}", "${data.block}", "${data.level}", "${data.bed}",
-      "${data.aircond}","${data.fees}","${data.status}", "${data.checkInDate}", "${data.checkOutDate}", "${data.numberOfSemester}")
+      ("${data.studentID}", "${data.roomNumber}", "${data.village}", "${data.block}", "${data.level}", "${data.bed}", "${data.aircond}",
+      "${data.fees}", "${data.status}", "${data.bookingDate}", "${data.expectedCheckInDate}", "${data.expectedCheckOutDate}", "${data.numberOfSemester}")
+      `;
+    } else if (data.type == "checkIn") {
+      var query = `
+      UPDATE bookingHistory
+      SET status = 'Checked-in', checkInDate = '${data.checkInDate}'
+      WHERE studentID = '${data.studentID}' AND roomNumber = '${data.roomNumber}'
+      `;
+    } else if (data.type == "checkOut") {
+      var query = `
+      UPDATE bookingHistory
+      SET status = 'Checked-out', checkOutDate = '${data.checkOutDate}'
+      WHERE studentID = '${data.studentID}' AND roomNumber = '${data.roomNumber}'
       `;
     }
-    //console.log(query);
+    console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
       resolve(snapshot);
@@ -231,13 +245,19 @@ module.exports.updateRoomInfo = function updateRoomInfo(data) {
     if (data.type == "updateRoomInfo") {
       var query = `
       UPDATE roomInfo
-      SET status = "1"
+      SET status = "${data.status}"
       WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
       `;
-    } else if (data.type == "updateCurrentCapacity") {
+    } else if (data.type == "deleteCurrentCapacity") {
       var query = `
       UPDATE roomInfo
       SET currentCapacity = currentCapacity - 1
+      WHERE roomNumber = "${data.roomNumber}"
+      `;
+    } else if (data.type == "addCurrentCapacity") {
+      var query = `
+      UPDATE roomInfo
+      SET currentCapacity = currentCapacity + 1
       WHERE roomNumber = "${data.roomNumber}"
       `;
     } else if (data.type == "addRoom") {
@@ -259,9 +279,16 @@ module.exports.updateRoomInfo = function updateRoomInfo(data) {
       price = "${data.price}",
       genderAllowed = "${data.gender}",
       status = "${data.status}"
+      WHERE roomNumber = "${data.roomNumber}" AND bed = "${data.bed}"
+      `;
+    } else if (data.type == 'checkOut') {
+      var query = `
+      UPDATE roomInfo
+      SET
+      status = "${data.status}"
       WHERE roomNumber = "${data.roomNumber}"
       `;
-    } 
+    }
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
