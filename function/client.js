@@ -177,10 +177,10 @@ module.exports.updateBookingInfo = function updateBookingInfo(data) {
     if (data.type == "createBookingHistory") {
       var query = `
       INSERT INTO bookingHistory
-      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, bookingDate, numberOfSemester)
+      (studentID, roomNumber, village, block, level, bed, aircond, fees, status, bookingDate, expectedCheckInDate, expectedCheckOutDate, numberOfSemester)
       VALUES
       ("${data.studentID}","${data.roomNumber}","${data.village}", "${data.block}", "${data.level}", "${data.bed}",
-      "${data.aircond}","${data.fees}","${data.status}", "${data.bookingDate}", "${data.numberOfSemester}")
+      "${data.aircond}","${data.fees}","${data.status}", "${data.bookingDate}", "${data.expectedCheckInDate}", "${data.expectedCheckOutDate}", "${data.numberOfSemester}")
       `;
     }
     //console.log(query);
@@ -349,6 +349,20 @@ module.exports.updateRoomInfo = function updateRoomInfo(data) {
       WHERE roomNumber = "${data.roomNumber}"
       `;
     }
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
+
+module.exports.getBookingDocument = function getBookingDocument(data) {
+  return new Promise((resolve, reject) => {
+    var query = `
+    SELECT *
+    FROM bookingDocument
+    `;
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {
       if (err) return reject(err.sqlMessage);
