@@ -164,48 +164,48 @@ module.exports.getRoomInfo = function getRoomInfo(data) {
       var query = `
       SELECT distinct village
       FROM roomInfo
-      WHERE genderAllowed = "${data.gender}"
+      WHERE genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY village ASC
       `;
     } else if (data.type == "getBuilding") {
       var query = `
       SELECT distinct block
       FROM roomInfo
-      WHERE village = "${data.village}" AND genderAllowed = "${data.gender}"
+      WHERE village = "${data.village}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY block ASC
       `;
     } else if (data.type == "getRoom") {
       var query = `
       SELECT *
       FROM roomInfo
-      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}"
+      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY roomNumber, bed ASC
       `;
     } else if (data.type == "filterRoom") {
       var query = `
       SELECT *
       FROM roomInfo
-      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND capacity = "${data.capacity}" AND genderAllowed = "${data.gender}"
+      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND capacity = "${data.capacity}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY roomNumber, bed ASC
       `;
     } else if (data.type == "getRoomCapacity") {
       var query = `
       SELECT distinct capacity
       FROM roomInfo
-      WHERE village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}"
+      WHERE village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY capacity ASC
       `;
     } else if (data.type == "getMinRoomCapacity") {
       var query = `
       SELECT distinct MIN(capacity) AS capacity
       FROM roomInfo
-      WHERE genderAllowed = "${data.gender}"
+      WHERE genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       `;
     } else if (data.type == "getMaxRoomCapacity") {
       var query = `
       SELECT distinct MAX(capacity) AS capacity
       FROM roomInfo
-      WHERE genderAllowed = "${data.gender}"
+      WHERE genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       `;
     } else if (data.type == "checkRoomAvailability") {
       var query = `
@@ -320,11 +320,27 @@ module.exports.getBookingDocument = function getBookingDocument(data) {
 
 module.exports.updateBookingDocument = function updateBookingDocument(data) {
   return new Promise((resolve, reject) => {
-    if (data.type == "bookingPeriod") {
+    if (data.type == "checkInOutDate") {
       var query = `
-      SELECT *
-      FROM bookingDocument
+      UPDATE bookingDocument
+      SET
+      sem1CheckInDate = "${data.sem1CheckInDate}",
+      sem1CheckOutDate = "${data.sem1CheckOutDate}",
+      sem2CheckInDate = "${data.sem2CheckInDate}",
+      sem2CheckOutDate = "${data.sem2CheckOutDate}",
+      sem3CheckInDate = "${data.sem3CheckInDate}",
+      sem3CheckOutDate = "${data.sem3CheckOutDate}",
+      maxBookingSemester = "${data.maxBookingSemester}"
+      WHERE id = 0
       `;
+    } else if (data.type == "bookingPeriod") {
+      var query = `
+      UPDATE bookingDocument
+      SET
+      bookingPeriodStart = "${data.bookingPeriodStart}",
+      bookingPeriodEnd = "${data.bookingPeriodEnd}"
+      WHERE id = 0
+      `; 
     }
     console.log(query);
     dbFYP.query(query, function (err, snapshot) {

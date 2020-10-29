@@ -263,48 +263,48 @@ module.exports.getRoomInfo = function getRoomInfo(data) {
       var query = `
       SELECT distinct village
       FROM roomInfo
-      WHERE genderAllowed = "${data.gender}"
+      WHERE genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY village ASC
       `;
     } else if (data.type == "getBuilding") {
       var query = `
       SELECT distinct block
       FROM roomInfo
-      WHERE village = "${data.village}" AND genderAllowed = "${data.gender}"
+      WHERE village = "${data.village}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY block ASC
       `;
     } else if (data.type == "getRoom") {
       var query = `
       SELECT *
       FROM roomInfo
-      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}"
+      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY roomNumber, bed ASC
       `;
     } else if (data.type == "filterRoom") {
       var query = `
       SELECT *
       FROM roomInfo
-      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND capacity = "${data.capacity}" AND genderAllowed = "${data.gender}"
+      WHERE status <= '1' AND village = "${data.village}" AND block = "${data.block}" AND capacity = "${data.capacity}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY roomNumber, bed ASC
       `;
     } else if (data.type == "getRoomCapacity") {
       var query = `
       SELECT distinct capacity
       FROM roomInfo
-      WHERE village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}"
+      WHERE village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       ORDER BY capacity ASC
       `;
     } else if (data.type == "getMinRoomCapacity") {
       var query = `
       SELECT distinct MIN(capacity) AS capacity
       FROM roomInfo
-      WHERE genderAllowed = "${data.gender}"
+      WHERE genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       `;
     } else if (data.type == "getMaxRoomCapacity") {
       var query = `
       SELECT distinct MAX(capacity) AS capacity
       FROM roomInfo
-      WHERE genderAllowed = "${data.gender}"
+      WHERE genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       `;
     } else if (data.type == "checkRoomAvailability") {
       var query = `
@@ -316,7 +316,7 @@ module.exports.getRoomInfo = function getRoomInfo(data) {
       //bulk booking
       var query = `
       SELECT *, SUM(price) AS unitPrice FROM roomInfo
-      WHERE capacity = "${data.capacity}" AND currentCapacity = "${data.capacity}" AND village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}"
+      WHERE capacity = "${data.capacity}" AND currentCapacity = "${data.capacity}" AND village = "${data.village}" AND block = "${data.block}" AND genderAllowed = "${data.gender}" AND (status = 0 OR status = 1)
       GROUP BY roomNumber
       `;
     } else if (data.type == "checkBulkRoomAvailability") {
