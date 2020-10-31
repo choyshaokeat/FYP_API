@@ -145,3 +145,16 @@ router.post('/updateBookingDocument', async function (req, res) {
     return RES.error(res, err, `Failed`);
   }
 });
+
+router.post('/getChartData', async function (req, res) {
+  try {
+    console.log('/getChartData');
+    var data = req.body.data;
+    data = encdec.decryptObject('admin', data);
+    data = await fc.getChartData(data);
+    return RES.solved(res, data, 'admin');
+  } catch (err) {
+    console.log('err', err);
+    return RES.error(res, err, `Failed`);
+  }
+});

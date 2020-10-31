@@ -349,3 +349,33 @@ module.exports.updateBookingDocument = function updateBookingDocument(data) {
     });
   });
 }
+
+module.exports.getChartData = function getChartData(data) {
+  return new Promise((resolve, reject) => {
+    if (data.type == "bookingRateChart") {
+      var query = `
+      SELECT 
+      (SELECT count(studentID) FROM studentInfo WHERE bookingStatus = '2') AS booked,
+      (SELECT count(studentID) FROM studentInfo WHERE bookingStatus != '2') AS notBook
+      `;
+    } else if (data.type == "semBookChart") {
+      var query = `
+      SELECT
+      (SELECT count(studentID) FROM bookingHistory WHERE expectedCheckInDate >= '${data.sem1CheckInDate}' AND expectedCheckOutDate <= '${data.sem1CheckOutDate}') AS sem1Data,
+      (SELECT count(studentID) FROM bookingHistory WHERE expectedCheckInDate >= '${data.sem2CheckInDate}' AND expectedCheckOutDate <= '${data.sem2CheckOutDate}') AS sem2Data,
+      (SELECT count(studentID) FROM bookingHistory WHERE expectedCheckInDate >= '${data.sem3CheckInDate}' AND expectedCheckOutDate <= '${data.sem3CheckOutDate}') AS sem3Data
+      `;
+    } else if (data.type == "villageOccupancyChart") {
+      var query = `
+      SELECT count(roomNumber) AS count
+      FROM roomInfo 
+      WHERE status = '${data.status}' AND village = '${data.village}'
+      `;
+    }
+    console.log(query);
+    dbFYP.query(query, function (err, snapshot) {
+      if (err) return reject(err.sqlMessage);
+      resolve(snapshot);
+    });
+  });
+}
