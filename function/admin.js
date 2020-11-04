@@ -108,7 +108,8 @@ module.exports.getBookingInfo = function getBookingInfo(data) {
       SELECT *
       FROM bookingHistory
       WHERE 
-      studentID = "${data.studentID}" AND (status = "Booked" OR status = "Checked-in")
+      studentID = "${data.studentID}" 
+      AND (status = "Booked" OR status = "Checked-in")
       ORDER BY UNIX_TIMESTAMP(bookingDate) DESC
       `;
     } else if (data.type == "all") {
@@ -235,7 +236,7 @@ module.exports.getRoomInfo = function getRoomInfo(data) {
       var query = `
       SELECT *
       FROM roomInfo
-      WHERE village = "${data.village}" AND genderAllowed = "${data.gender}" AND capacity = "${data.capacity}"
+      WHERE village = "${data.village}" AND genderAllowed = "${data.gender}" AND capacity = "${data.capacity}" AND status = "${data.status}"
       ORDER BY roomNumber, bed ASC
       `;
     }
