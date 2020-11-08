@@ -4,6 +4,7 @@ const cors = require('cors');
 
 var db = require('./api/db.js');
 var agent = require('./api/agent.js');
+var cron = require('./api/cron.js');
 var client = require('./api/client.js');
 var admin = require('./api/admin.js');
 
@@ -23,21 +24,8 @@ app.use('/db', db);
 app.use('/agent', agent);
 app.use('/client', client);
 app.use('/admin', admin);
-app.get(function(req,res,next){
-	req.io = io;
-	next();
-	})
+app.use('/cron', cron);
+
 const port = process.env.PORT || 8000;
 server.listen(port);
-
-io.on('connection', function(socket){
-  console.log('User connected');
-	socket.broadcast.emit('broadcastData', { status: true });
-	socket.emit('syncServer', { status: true });
-  socket.on('syncMerchant', (data) => {
-		console.log(data);
-		socket.broadcast.emit(data.merchantID, data);
-		
-  });
-});
 console.log(`Server started! Port is ${port}`);

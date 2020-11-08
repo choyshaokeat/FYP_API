@@ -339,7 +339,8 @@ module.exports.updateBookingDocument = function updateBookingDocument(data) {
       UPDATE bookingDocument
       SET
       bookingPeriodStart = "${data.bookingPeriodStart}",
-      bookingPeriodEnd = "${data.bookingPeriodEnd}"
+      bookingPeriodEnd = "${data.bookingPeriodEnd}",
+      emailStatus = 0
       WHERE id = 0
       `; 
     }
